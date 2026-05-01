@@ -13,342 +13,179 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --blue: #1a6fa8;
-      --blue-light: #e8f4fd;
-      --green: #2d8a4e;
-      --green-light: #e8f7ed;
-      --amber: #b06000;
-      --amber-light: #fef3e2;
-      --red: #c0392b;
-      --red-light: #fdeaea;
-      --gray: #6b7280;
-      --gray-light: #f3f4f6;
-      --border: #e5e7eb;
-      --text: #111827;
-      --text-muted: #6b7280;
-      --bg: #ffffff;
-      --surface: #f9fafb;
-      --radius: 14px;
-      --radius-sm: 8px;
+      --green: #2d8a4e; --green-light: #e8f7ed;
+      --blue: #1a6fa8;  --blue-light: #e8f4fd;
+      --amber: #b06000; --amber-light: #fef3e2;
+      --red: #c0392b;   --red-light: #fdeaea;
+      --border: #e5e7eb; --text: #111827; --text-muted: #6b7280;
+      --bg: #ffffff; --surface: #f9fafb;
+      --radius: 14px; --radius-sm: 8px;
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
-        --border: #2d3748;
-        --text: #f1f5f9;
-        --text-muted: #94a3b8;
-        --bg: #0f172a;
-        --surface: #1e293b;
-        --blue-light: #0c2d4a;
-        --green-light: #0d2d1a;
-        --amber-light: #2d1e00;
-        --red-light: #2d0d0d;
-        --gray-light: #1e293b;
+        --border: #2d3748; --text: #f1f5f9; --text-muted: #94a3b8;
+        --bg: #0f172a; --surface: #1e293b;
+        --blue-light: #0c2d4a; --green-light: #0d2d1a;
+        --amber-light: #2d1e00; --red-light: #2d0d0d;
       }
     }
-
     html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-
     .app { max-width: 430px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
-
-    .header {
-      padding: 52px 20px 16px;
-      text-align: center;
-      background: var(--bg);
-      border-bottom: 0.5px solid var(--border);
-    }
-    .header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+    .header { padding: 52px 20px 16px; text-align: center; border-bottom: 0.5px solid var(--border); }
+    .header h1 { font-size: 17px; font-weight: 600; }
     .header p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-    .content { flex: 1; padding: 16px; overflow-y: auto; }
-
-    /* Temperature hero */
-    .temp-hero {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 20px 20px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
+    .content { flex: 1; padding: 16px; }
+    .temp-hero { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 28px 20px 20px; text-align: center; margin-bottom: 12px; }
     .temp-label { font-size: 12px; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
     .temp-value { font-size: 72px; font-weight: 300; line-height: 1; letter-spacing: -3px; }
     .temp-unit { font-size: 28px; font-weight: 300; vertical-align: super; letter-spacing: 0; }
     .temp-station { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
-    .swim-pill {
-      display: inline-block;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 6px 16px;
-      border-radius: 20px;
-      margin-top: 14px;
-    }
-
-    /* Stats grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-    }
+    .swim-pill { display: inline-block; font-size: 13px; font-weight: 500; padding: 6px 16px; border-radius: 20px; margin-top: 14px; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .stat-card { background: var(--surface); border-radius: var(--radius-sm); padding: 14px; }
     .stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
     .stat-card .value { font-size: 22px; font-weight: 500; }
     .stat-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-    /* Swim advice */
-    .advice-card {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 12px;
-    }
+    .advice-card { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
     .advice-card h3 { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
-    .advice-card p { font-size: 14px; line-height: 1.6; color: var(--text); }
-
-    /* Monthly chart */
-    .chart-card {
-      background: var(--bg);
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 12px;
-    }
+    .advice-card p { font-size: 14px; line-height: 1.6; }
+    .chart-card { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
     .chart-card h3 { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 14px; }
     .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
     .bar-month { font-size: 11px; color: var(--text-muted); width: 28px; }
     .bar-track { flex: 1; height: 7px; background: var(--surface); border-radius: 4px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+    .bar-fill { height: 100%; border-radius: 4px; }
     .bar-num { font-size: 11px; color: var(--text-muted); width: 38px; text-align: right; }
     .bar-row.current .bar-month { color: var(--text); font-weight: 600; }
     .bar-row.current .bar-num { color: var(--text); font-weight: 600; }
-
-    /* Footer */
-    .footer {
-      padding: 12px 20px 32px;
-      text-align: center;
-      border-top: 0.5px solid var(--border);
-    }
-    .refresh-btn {
-      width: 100%;
-      padding: 12px;
-      background: transparent;
-      border: 0.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: background 0.15s;
-    }
+    .footer { padding: 12px 20px 32px; text-align: center; border-top: 0.5px solid var(--border); }
+    .refresh-btn { width: 100%; padding: 12px; background: transparent; border: 0.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; color: var(--text-muted); cursor: pointer; }
     .refresh-btn:active { background: var(--surface); }
     .source-line { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
-
-    /* States */
     .loading-state { padding: 60px 20px; text-align: center; color: var(--text-muted); }
-    .loading-spinner {
-      width: 28px; height: 28px;
-      border: 2px solid var(--border);
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px;
-    }
+    .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .error-state {
-      background: var(--red-light);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      font-size: 13px;
-      color: var(--red);
-      text-align: center;
-    }
+    .error-state { background: var(--red-light); border-radius: var(--radius-sm); padding: 14px; font-size: 13px; color: var(--red); text-align: center; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="header">
-      <h1>Ammersee</h1>
-      <p id="last-update">Wird geladen…</p>
-    </div>
-    <div class="content" id="content">
-      <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Daten werden abgerufen…</p>
-      </div>
-    </div>
-    <div class="footer">
-      <button class="refresh-btn" onclick="loadData()">↻ Aktualisieren</button>
-      <p class="source-line" id="source-line" style="display:none">Quellen: GKD Bayern · Open-Meteo</p>
-    </div>
+<div class="app">
+  <div class="header">
+    <h1>Ammersee</h1>
+    <p id="last-update">Wird geladen…</p>
   </div>
+  <div class="content" id="content">
+    <div class="loading-state"><div class="spinner"></div><p>Daten werden abgerufen…</p></div>
+  </div>
+  <div class="footer">
+    <button class="refresh-btn" onclick="loadData()">↻ Aktualisieren</button>
+    <p class="source-line">Wetter: Open-Meteo · Wassertemp: Saisonschätzung GKD Bayern</p>
+  </div>
+</div>
 
-  <script>
-    // ─── Config ───────────────────────────────────────────────
-    const AMMERSEE_LAT = 47.9889;
-    const AMMERSEE_LNG = 11.1103;
-    const MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-    const AVG_TEMPS = [3, 3, 5, 9, 14, 18, 20, 20, 17, 13, 8, 4];
+<script>
+  const LAT = 47.9889, LNG = 11.1103;
+  const MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const AVG_WATER = [3, 3, 5, 9, 14, 18, 20, 20, 17, 13, 8, 4];
 
-    // ─── Swim logic ───────────────────────────────────────────
-    function getSwimStatus(waterTemp) {
-      if (waterTemp >= 22) return { label: 'Ideal zum Schwimmen', color: '#2d8a4e', bg: 'var(--green-light)' };
-      if (waterTemp >= 18) return { label: 'Angenehm warm', color: '#2d8a4e', bg: 'var(--green-light)' };
-      if (waterTemp >= 15) return { label: 'Erfrischend kühl', color: '#1a6fa8', bg: 'var(--blue-light)' };
-      if (waterTemp >= 12) return { label: 'Nur für Geübte', color: '#b06000', bg: 'var(--amber-light)' };
-      return { label: 'Zu kalt zum Baden', color: '#c0392b', bg: 'var(--red-light)' };
-    }
+  function estimateWaterTemp(month, airTemp) {
+    const base = AVG_WATER[month];
+    const airInfluence = Math.max(-1.5, Math.min(1.5, (airTemp - 15) * 0.1));
+    return Math.round((base + airInfluence) * 10) / 10;
+  }
 
-    function getBarColor(t) {
-      if (t >= 18) return '#2d8a4e';
-      if (t >= 14) return '#1a6fa8';
-      if (t >= 8)  return '#b06000';
-      return '#9ca3af';
-    }
+  function getSwimStatus(waterTemp, airTemp, windSpeed) {
+    const windNote = windSpeed > 20 ? ` Der Wind (${Math.round(windSpeed)} km/h) kühlt nach dem Baden stark ab.`
+                   : windSpeed > 10 ? ` Etwas Wind (${Math.round(windSpeed)} km/h) — Handtuch bereithalten.`
+                   : '';
+    if (waterTemp >= 22) return {
+      label: 'Ideal zum Schwimmen', color: '#2d8a4e', bg: 'var(--green-light)',
+      advice: `Mit ${waterTemp.toFixed(1)}°C Wassertemperatur und ${airTemp.toFixed(1)}°C Luft sind die Bedingungen ausgezeichnet.${windNote} Perfekt für einen langen Badetag.`
+    };
+    if (waterTemp >= 18) return {
+      label: 'Angenehm warm', color: '#2d8a4e', bg: 'var(--green-light)',
+      advice: `${waterTemp.toFixed(1)}°C Wassertemperatur — angenehm für die meisten Schwimmer.${windNote}`
+    };
+    if (waterTemp >= 15) return {
+      label: 'Erfrischend kühl', color: '#1a6fa8', bg: 'var(--blue-light)',
+      advice: `${waterTemp.toFixed(1)}°C ist erfrischend kühl aber schwimmbar. ${airTemp >= 20 ? 'Die warme Luft (' + airTemp.toFixed(1) + '°C) macht es angenehmer.' : 'Kurze Badeeinheiten empfohlen.'}${windNote}`
+    };
+    if (waterTemp >= 12) return {
+      label: 'Nur für Geübte', color: '#b06000', bg: 'var(--amber-light)',
+      advice: `${waterTemp.toFixed(1)}°C ist kalt — nur für erfahrene Kälteschwimmer geeignet. Kurze Badezeit, danach sofort warm einpacken.${windNote}`
+    };
+    return {
+      label: 'Zu kalt zum Baden', color: '#c0392b', bg: 'var(--red-light)',
+      advice: `${waterTemp.toFixed(1)}°C — zu kalt für normales Schwimmen. Unterkühlung möglich bei längerem Aufenthalt im Wasser.`
+    };
+  }
 
-    // ─── Render ───────────────────────────────────────────────
-    function render(data) {
-      const { waterTemp, airTemp, windSpeed, humidity, swimAdvice } = data;
-      const swim = getSwimStatus(waterTemp);
-      const now = new Date();
-      const month = now.getMonth();
+  function getBarColor(t) {
+    if (t >= 18) return '#2d8a4e';
+    if (t >= 14) return '#1a6fa8';
+    if (t >= 8)  return '#b06000';
+    return '#9ca3af';
+  }
 
-      document.getElementById('last-update').textContent =
-        'Stand: ' + now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+  function render(airTemp, windSpeed, humidity, month) {
+    const waterTemp = estimateWaterTemp(month, airTemp);
+    const swim = getSwimStatus(waterTemp, airTemp, windSpeed);
+    const now = new Date();
+    document.getElementById('last-update').textContent =
+      'Stand: ' + now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
 
-      const bars = AVG_TEMPS.map((t, i) => {
-        const pct = Math.round((t / 24) * 100);
-        const isCurrent = i === month;
-        return `<div class="bar-row ${isCurrent ? 'current' : ''}">
-          <span class="bar-month">${MONTHS[i]}</span>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:${pct}%;background:${getBarColor(t)};opacity:${isCurrent ? 1 : 0.4}"></div>
-          </div>
-          <span class="bar-num">${t}°</span>
-        </div>`;
-      }).join('');
-
-      document.getElementById('content').innerHTML = `
-        <div class="temp-hero">
-          <div class="temp-label">Wassertemperatur</div>
-          <div class="temp-value" style="color:${swim.color}">
-            ${waterTemp.toFixed(1)}<span class="temp-unit">°C</span>
-          </div>
-          <div class="temp-station">Messstation Stegen / Ammersee</div>
-          <span class="swim-pill" style="background:${swim.bg};color:${swim.color}">${swim.label}</span>
+    const bars = AVG_WATER.map((t, i) => `
+      <div class="bar-row ${i === month ? 'current' : ''}">
+        <span class="bar-month">${MONTHS[i]}</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${Math.round((t/24)*100)}%;background:${getBarColor(t)};opacity:${i === month ? 1 : 0.4}"></div>
         </div>
+        <span class="bar-num">${t}°</span>
+      </div>`).join('');
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="label">Lufttemperatur</div>
-            <div class="value">${airTemp.toFixed(1)}°</div>
-            <div class="sub">aktuell</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Wind</div>
-            <div class="value">${Math.round(windSpeed)}</div>
-            <div class="sub">km/h</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Luftfeuchtigkeit</div>
-            <div class="value">${Math.round(humidity)}%</div>
-            <div class="sub">relativ</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Badekomfort</div>
-            <div class="value" style="font-size:15px;line-height:1.3;color:${swim.color}">${swim.label}</div>
-          </div>
-        </div>
+    document.getElementById('content').innerHTML = `
+      <div class="temp-hero">
+        <div class="temp-label">Wassertemperatur</div>
+        <div class="temp-value" style="color:${swim.color}">${waterTemp.toFixed(1)}<span class="temp-unit">°C</span></div>
+        <div class="temp-station">Saisonschätzung · Ammersee</div>
+        <span class="swim-pill" style="background:${swim.bg};color:${swim.color}">${swim.label}</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="label">Lufttemperatur</div><div class="value">${airTemp.toFixed(1)}°</div><div class="sub">aktuell</div></div>
+        <div class="stat-card"><div class="label">Wind</div><div class="value">${Math.round(windSpeed)}</div><div class="sub">km/h</div></div>
+        <div class="stat-card"><div class="label">Luftfeuchtigkeit</div><div class="value">${Math.round(humidity)}%</div><div class="sub">relativ</div></div>
+        <div class="stat-card"><div class="label">Badekomfort</div><div class="value" style="font-size:15px;line-height:1.3;color:${swim.color}">${swim.label}</div></div>
+      </div>
+      <div class="advice-card">
+        <h3>Schwimmbarkeits-Einschätzung</h3>
+        <p>${swim.advice}</p>
+      </div>
+      <div class="chart-card">
+        <h3>Durchschnitt nach Monat</h3>
+        ${bars}
+      </div>`;
+  }
 
-        <div class="advice-card">
-          <h3>Schwimmbarkeits-Einschätzung</h3>
-          <p>${swimAdvice}</p>
-        </div>
-
-        <div class="chart-card">
-          <h3>Durchschnitt nach Monat</h3>
-          ${bars}
-        </div>
-      `;
-
-      document.getElementById('source-line').style.display = 'block';
+  async function loadData() {
+    document.getElementById('content').innerHTML =
+      '<div class="loading-state"><div class="spinner"></div><p>Daten werden abgerufen…</p></div>';
+    document.getElementById('last-update').textContent = 'Wird geladen…';
+    try {
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=Europe%2FBerlin`);
+      const d = await res.json();
+      render(d.current.temperature_2m, d.current.wind_speed_10m, d.current.relative_humidity_2m, new Date().getMonth());
+    } catch {
+      document.getElementById('content').innerHTML =
+        '<div class="error-state">Verbindungsfehler — bitte erneut versuchen.</div>';
     }
+  }
 
-    function renderError(msg) {
-      document.getElementById('content').innerHTML = `<div class="error-state">${msg}</div>`;
-    }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/ammersee/sw.js', { scope: '/ammersee/' }).catch(() => {});
+  }
 
-    // ─── Data fetching ────────────────────────────────────────
-    async function loadData() {
-      document.getElementById('content').innerHTML = `
-        <div class="loading-state">
-          <div class="loading-spinner"></div>
-          <p>Daten werden abgerufen…</p>
-        </div>`;
-
-      try {
-        // 1. Wetterdaten via Open-Meteo (kostenloses API, kein Key)
-        const weatherRes = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${AMMERSEE_LAT}&longitude=${AMMERSEE_LNG}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=Europe%2FBerlin`
-        );
-        const weather = await weatherRes.json();
-        const airTemp   = weather.current.temperature_2m;
-        const windSpeed = weather.current.wind_speed_10m;
-        const humidity  = weather.current.relative_humidity_2m;
-
-        // 2. Wassertemperatur + Einschätzung via Claude API
-        const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            system: `Du bist ein Wetter-Assistent für den Ammersee in Bayern. 
-Antworte AUSSCHLIESSLICH mit einem validen JSON-Objekt ohne Markdown oder anderen Text.
-Format: {"waterTemp": <zahl mit einer Dezimalstelle>, "swimAdvice": "<2 kurze Sätze auf Deutsch>"}`,
-            messages: [{
-              role: 'user',
-              content: `Aktuell am Ammersee: Lufttemperatur ${airTemp.toFixed(1)}°C, Wind ${windSpeed} km/h, Luftfeuchtigkeit ${humidity}%.
-Das aktuelle Datum ist ${new Date().toLocaleDateString('de-DE', { month: 'long', day: 'numeric' })}.
-
-Schätze die aktuelle Wassertemperatur des Ammersees basierend auf der Jahreszeit (Saisonmittel Mai: ~10-12°C) und den Wetterbedingungen.
-Gib eine kurze Schwimmbarkeits-Einschätzung die Wassertemperatur UND Wetter kombiniert berücksichtigt.
-Antworte NUR mit JSON: {"waterTemp": <zahl>, "swimAdvice": "<einschätzung>"}`
-            }]
-          })
-        });
-
-        const claudeData = await claudeRes.json();
-        const textBlock  = claudeData.content?.find(b => b.type === 'text');
-        const raw        = textBlock?.text?.trim() || '{}';
-        const parsed     = JSON.parse(raw.replace(/```json|```/g, '').trim());
-
-        render({
-          waterTemp:  typeof parsed.waterTemp === 'number' ? parsed.waterTemp : 10.5,
-          airTemp,
-          windSpeed,
-          humidity,
-          swimAdvice: parsed.swimAdvice || 'Keine Einschätzung verfügbar.'
-        });
-
-      } catch (err) {
-        console.error(err);
-        renderError('Verbindungsfehler — bitte erneut versuchen.');
-      }
-    }
-
-    // ─── Service Worker ───────────────────────────────────────
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
-    }
-
-    loadData();
-  </script>
+  loadData();
+</script>
 </body>
 </html>
