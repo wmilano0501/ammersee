@@ -80,28 +80,25 @@
   </div>
   <div class="footer">
     <button class="refresh-btn" onclick="loadData()">↻ Aktualisieren</button>
-    <p class="source-line">Wetter: Open-Meteo · Wassertemp: Saisonschätzung GKD Bayern</p>
+    <p class="source-line">Wassertemp: GKD Bayern · Wetter: Open-Meteo</p>
   </div>
 </div>
 
 <script>
+  // ─── Config ──────────────────────────────────────────────────
+  const WORKER_URL = 'https://ammersee-proxy.wmilano0501.workers.dev';
   const LAT = 47.9889, LNG = 11.1103;
   const MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   const AVG_WATER = [3, 3, 5, 9, 14, 18, 20, 20, 17, 13, 8, 4];
 
-  function estimateWaterTemp(month, airTemp) {
-    const base = AVG_WATER[month];
-    const airInfluence = Math.max(-1.5, Math.min(1.5, (airTemp - 15) * 0.1));
-    return Math.round((base + airInfluence) * 10) / 10;
-  }
-
+  // ─── Swim logic ───────────────────────────────────────────────
   function getSwimStatus(waterTemp, airTemp, windSpeed) {
     const windNote = windSpeed > 20 ? ` Der Wind (${Math.round(windSpeed)} km/h) kühlt nach dem Baden stark ab.`
                    : windSpeed > 10 ? ` Etwas Wind (${Math.round(windSpeed)} km/h) — Handtuch bereithalten.`
                    : '';
     if (waterTemp >= 22) return {
       label: 'Ideal zum Schwimmen', color: '#2d8a4e', bg: 'var(--green-light)',
-      advice: `Mit ${waterTemp.toFixed(1)}°C Wassertemperatur und ${airTemp.toFixed(1)}°C Luft sind die Bedingungen ausgezeichnet.${windNote} Perfekt für einen langen Badetag.`
+      advice: `Mit ${waterTemp.toFixed(1)}°C Wassertemperatur und ${airTemp.toFixed(1)}°C Luft sind die Bedingungen ausgezeichnet.${windNote}`
     };
     if (waterTemp >= 18) return {
       label: 'Angenehm warm', color: '#2d8a4e', bg: 'var(--green-light)',
@@ -128,12 +125,13 @@
     return '#9ca3af';
   }
 
-  function render(airTemp, windSpeed, humidity, month) {
-    const waterTemp = estimateWaterTemp(month, airTemp);
+  // ─── Render ───────────────────────────────────────────────────
+  function render(waterTemp, waterTimestamp, airTemp, windSpeed, humidity) {
     const swim = getSwimStatus(waterTemp, airTemp, windSpeed);
-    const now = new Date();
+    const month = new Date().getMonth();
+
     document.getElementById('last-update').textContent =
-      'Stand: ' + now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+      'Messung: ' + (waterTimestamp || new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr');
 
     const bars = AVG_WATER.map((t, i) => `
       <div class="bar-row ${i === month ? 'current' : ''}">
@@ -148,7 +146,7 @@
       <div class="temp-hero">
         <div class="temp-label">Wassertemperatur</div>
         <div class="temp-value" style="color:${swim.color}">${waterTemp.toFixed(1)}<span class="temp-unit">°C</span></div>
-        <div class="temp-station">Saisonschätzung · Ammersee</div>
+        <div class="temp-station">Messstation Stegen / Ammersee · GKD Bayern</div>
         <span class="swim-pill" style="background:${swim.bg};color:${swim.color}">${swim.label}</span>
       </div>
       <div class="stats-grid">
@@ -167,17 +165,36 @@
       </div>`;
   }
 
+  // ─── Data fetching ────────────────────────────────────────────
   async function loadData() {
     document.getElementById('content').innerHTML =
       '<div class="loading-state"><div class="spinner"></div><p>Daten werden abgerufen…</p></div>';
     document.getElementById('last-update').textContent = 'Wird geladen…';
+
     try {
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=Europe%2FBerlin`);
-      const d = await res.json();
-      render(d.current.temperature_2m, d.current.wind_speed_10m, d.current.relative_humidity_2m, new Date().getMonth());
-    } catch {
+      // Beide Quellen parallel abrufen
+      const [waterRes, weatherRes] = await Promise.all([
+        fetch(WORKER_URL),
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=Europe%2FBerlin`)
+      ]);
+
+      const waterData  = await waterRes.json();
+      const weatherData = await weatherRes.json();
+
+      if (waterData.error) throw new Error(waterData.error);
+
+      render(
+        waterData.waterTemp,
+        waterData.timestamp,
+        weatherData.current.temperature_2m,
+        weatherData.current.wind_speed_10m,
+        weatherData.current.relative_humidity_2m
+      );
+
+    } catch (err) {
       document.getElementById('content').innerHTML =
         '<div class="error-state">Verbindungsfehler — bitte erneut versuchen.</div>';
+      console.error(err);
     }
   }
 
