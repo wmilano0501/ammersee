@@ -1,13 +1,16 @@
+ON
+Kopieren
+
 {
   "name": "Ammersee Temperatur",
   "short_name": "Ammersee",
   "description": "Aktuelle Wassertemperatur und Schwimmbarkeit am Ammersee",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/ammersee/",
+  "scope": "/ammersee/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#1a6fa8",
   "lang": "de",
   "icons": [
     {
